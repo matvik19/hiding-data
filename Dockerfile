@@ -1,24 +1,21 @@
-FROM python:3.13-slim
+FROM python:3.12-slim
 
-WORKDIR /app
+# Устанавливаем рабочую директорию
+WORKDIR /fastapi_app
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    curl \
-    gcc \
-    g++ \
-    make \
-    libpq-dev \
-    && pip install --no-cache-dir --upgrade pip \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+# Устанавливаем необходимые утилиты
+RUN apt-get update && apt-get install -y netcat-openbsd && rm -rf /var/lib/apt/lists/*
 
-COPY src/requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt \
-    && apt-get purge -y --auto-remove gcc g++ make
+# Копируем файл зависимостей в контейнер
+COPY requirements.txt .
 
-COPY src/ .
+# Устанавливаем зависимости
+RUN pip install --no-cache-dir -r requirements.txt
 
-ENV PYTHONPATH=/app
+# Копируем все файлы проекта в контейнер
+COPY . .
 
 EXPOSE 8000
 
-CMD ["gunicorn", "-w", "1", "-k", "uvicorn.workers.UvicornWorker", "-b", "0.0.0.0:8000", "app.web_app:application"]
+# Указываем команду запуска
+CMD ["gunicorn", "-w", "1", "-k", "uvicorn.workers.UvicornWorker", "-b", "0.0.0.0:8000", "main:app"]
