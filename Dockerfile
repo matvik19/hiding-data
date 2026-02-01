@@ -15,6 +15,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Копируем все файлы проекта в контейнер
 COPY . .
 
+# Добавляем src в PYTHONPATH чтобы импорты работали
+ENV PYTHONPATH=/fastapi_app/src:$PYTHONPATH
+
 EXPOSE 8000
 
 # Указываем команду запуска
