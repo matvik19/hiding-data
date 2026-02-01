@@ -8,7 +8,7 @@ services:
     container_name: hiding_data_api
     restart: unless-stopped
     ports:
-      - "127.0.0.1:3008:8000"
+      - "127.0.0.1:3010:8000"
     networks:
       - hiding_data_network
       - postgres_network
