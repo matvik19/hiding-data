@@ -8,8 +8,7 @@ from app.core.settings import config
 from app.core.logging import logger
 from app.core.broker.middlewares.logging_middleware import LoggingMiddleware
 from app.core.broker.middlewares.retry_middleware import RetryMiddleware
-from app.core.broker.routers.rules import rules_router
-from app.core.broker.routers.leads import leads_router
+from app.core.broker.routers.permissions import permissions_router
 from app.core.broker.routers.health import health_router
 
 
@@ -24,3 +23,6 @@ broker = RabbitBroker(
     default_channel=Channel(prefetch_count=config.worker_cfg.PREFETCH_COUNT),
 )
 
+# Подключаем роутеры
+broker.include_router(permissions_router)
+broker.include_router(health_router)

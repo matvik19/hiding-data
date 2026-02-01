@@ -1,7 +1,7 @@
 [project]
-name = "leads-coloring"
+name = "hiding-data"
 version = "0.1.0"
-description = "AmoCRM Leads Coloring Widget Backend"
+description = "AmoCRM Data Hiding Widget Backend"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [

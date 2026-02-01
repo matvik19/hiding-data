@@ -11,7 +11,7 @@ class DBConfig(BaseSettings):
     HOST: str = "localhost"
     USER: str = "postgres"
     PASSWORD: str = "password"
-    DATABASE: str = "leads_coloring"
+    DATABASE: str = "hiding_data"
     PORT: int = 5432
 
     SQLALCHEMY_DATABASE_URI: Optional[PostgresDsn] = None
@@ -106,8 +106,8 @@ class AppConfig(BaseSettings):
     """
 
     VERSION: str = "0.1.0"
-    PROJECT_DESC: str = "AmoCRM Leads Coloring Widget Backend"
-    PROJECT_NAME: str = "Leads Coloring Service"
+    PROJECT_DESC: str = "AmoCRM Data Hiding Widget Backend"
+    PROJECT_NAME: str = "Data Hiding Service"
 
     OPENAPI_PATH: str = "/openapi.json"
     NAMESPACE: str = ""

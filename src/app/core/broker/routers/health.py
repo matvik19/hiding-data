@@ -30,5 +30,5 @@ async def handle_health_check(data: dict) -> Dict[str, Any]:
 
     return {
         "status": "ok",
-        "service": "leads-coloring"
+        "service": "hiding-data"
     }

@@ -11,7 +11,7 @@ from app.core.broker.app import broker
 from app.core.logging import setup_logging, logger
 
 # Настраиваем логирование для воркера
-setup_logging(service_name="leads-coloring-worker", environment="production")
+setup_logging(service_name="hiding-data-worker", environment="production")
 
 # Создаем FastStream приложение
 app = FastStream(broker)

@@ -15,7 +15,7 @@ class ContextFilter(logging.Filter):
         return True
 
 
-def setup_logging(service_name: str = "leads-coloring", environment: str = "production"):
+def setup_logging(service_name: str = "hiding-data", environment: str = "production"):
     """
     Настраивает логирование один раз при старте приложения
     """
