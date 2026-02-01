@@ -7,13 +7,16 @@ from starlette.middleware.cors import CORSMiddleware
 
 from src.app.core.logging import setup_logging, logger
 from src.app.api.api_v1.api import api_router
+from src.app.db.async_session import wait_for_db, run_migrations
 
 setup_logging(service_name="hiding-data", environment="production")
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Управление жизненным циклом FastAPI."""
+    """Управление жизненным циклом FastAPI (миграции БД)."""
+    await wait_for_db()
+    await run_migrations()
     logger.info("FastAPI приложение готово к работе.")
 
     try:
