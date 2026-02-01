@@ -1,0 +1,41 @@
+services:
+  api:
+    container_name: hiding_data_api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "127.0.0.1:3008:8000"
+    env_file:
+      - .env
+    networks:
+      - hiding_data_network
+      - postgres_network
+      - rabbitmq_rabbit-net
+      - loki_default
+    restart: unless-stopped
+    command: uvicorn app.web_app:application --host 0.0.0.0 --port 8000
+
+  worker:
+    container_name: hiding_data_worker
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env-non-dev
+    networks:
+      - postgres_network
+      - rabbitmq_rabbit-net
+      - loki_default
+    restart: unless-stopped
+    command: faststream run app.broker_app:app --workers 1
+
+networks:
+  hiding_data_network:
+    driver: bridge
+  postgres_network:
+    external: true
+  rabbitmq_rabbit-net:
+    external: true
+  loki_default:
+    external: true
