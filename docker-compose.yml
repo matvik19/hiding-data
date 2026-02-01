@@ -4,7 +4,7 @@ services:
     build:
       context: .
     env_file:
-      - .env-non-dev
+      - .env
     container_name: hiding_data_api
     restart: unless-stopped
     ports:
@@ -20,7 +20,7 @@ services:
       context: .
     command: faststream run broker_app:app --workers 1
     env_file:
-      - .env-non-dev
+      - .env
     container_name: hiding_data_worker
     restart: unless-stopped
     networks:
