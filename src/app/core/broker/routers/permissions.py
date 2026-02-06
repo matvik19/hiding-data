@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.broker.config import QueueNames
 from app.core.broker.dependencies import get_db_session
+from app.core.logging import logger, subdomain_var
 from app.services.permissions_service import (
     get_permissions_by_manager,
     save_permissions,
@@ -29,9 +30,24 @@ async def handle_save_settings(
     try:
         # Валидация данных через Pydantic
         request = SaveSettingsRequest(**data)
+        subdomain_var.set(request.subdomain)
 
-        # Сохранение настроек
+        logger.info(
+            "Получено сообщение SAVE | subdomain: %s, manager_id: %s, queue: %s",
+            request.subdomain,
+            request.manager_id,
+            QueueNames.SETTINGS_SAVE
+        )
+
+        # Вызов сервисного слоя
         permissions = await save_permissions(request, db_session)
+
+        logger.info(
+            "Отправка успешного ответа | subdomain: %s, manager_id: %s, record_id: %s",
+            permissions.subdomain,
+            permissions.manager_id,
+            permissions.id
+        )
 
         return {
             "success": True,
@@ -44,6 +60,11 @@ async def handle_save_settings(
             }
         }
     except Exception as e:
+        logger.error(
+            "Ошибка обработки SAVE | error: %s, error_type: %s",
+            str(e),
+            type(e).__name__
+        )
         return {
             "success": False,
             "error": str(e)
@@ -65,10 +86,25 @@ async def handle_get_settings(
         manager_id = data.get("manager_id")
 
         if not subdomain or not manager_id:
+            logger.warning(
+                "Некорректный запрос GET | missing_params: subdomain=%s, manager_id=%s",
+                subdomain is None,
+                manager_id is None
+            )
             return {
                 "success": False,
                 "error": "subdomain and manager_id are required"
             }
+
+        # Устанавливаем subdomain для логов
+        subdomain_var.set(subdomain)
+
+        logger.info(
+            "Получено сообщение GET | subdomain: %s, manager_id: %s, queue: %s",
+            subdomain,
+            manager_id,
+            QueueNames.SETTINGS_GET
+        )
 
         # Получение настроек
         permissions = await get_permissions_by_manager(
@@ -78,10 +114,22 @@ async def handle_get_settings(
         )
 
         if not permissions:
+            logger.info(
+                "Отправка ответа NOT_FOUND | subdomain: %s, manager_id: %s",
+                subdomain,
+                manager_id
+            )
             return {
                 "success": False,
                 "error": "Settings not found"
             }
+
+        logger.info(
+            "Отправка успешного ответа GET | subdomain: %s, manager_id: %s, record_id: %s",
+            subdomain,
+            manager_id,
+            permissions.id
+        )
 
         return {
             "success": True,
@@ -94,6 +142,11 @@ async def handle_get_settings(
             }
         }
     except Exception as e:
+        logger.error(
+            "Ошибка обработки GET | error: %s, error_type: %s",
+            str(e),
+            type(e).__name__
+        )
         return {
             "success": False,
             "error": str(e)
@@ -115,10 +168,25 @@ async def handle_delete_settings(
         manager_id = data.get("manager_id")
 
         if not subdomain or not manager_id:
+            logger.warning(
+                "Некорректный запрос DELETE | missing_params: subdomain=%s, manager_id=%s",
+                subdomain is None,
+                manager_id is None
+            )
             return {
                 "success": False,
                 "error": "subdomain and manager_id are required"
             }
+
+        # Устанавливаем subdomain для логов
+        subdomain_var.set(subdomain)
+
+        logger.info(
+            "Получено сообщение DELETE | subdomain: %s, manager_id: %s, queue: %s",
+            subdomain,
+            manager_id,
+            QueueNames.SETTINGS_DELETE
+        )
 
         # Удаление настроек
         deleted = await delete_permissions(
@@ -128,15 +196,31 @@ async def handle_delete_settings(
         )
 
         if not deleted:
+            logger.info(
+                "Отправка ответа NOT_FOUND | subdomain: %s, manager_id: %s",
+                subdomain,
+                manager_id
+            )
             return {
                 "success": False,
                 "error": "Settings not found or already deleted"
             }
 
+        logger.info(
+            "Отправка успешного ответа DELETE | subdomain: %s, manager_id: %s",
+            subdomain,
+            manager_id
+        )
+
         return {
             "success": True
         }
     except Exception as e:
+        logger.error(
+            "Ошибка обработки DELETE | error: %s, error_type: %s",
+            str(e),
+            type(e).__name__
+        )
         return {
             "success": False,
             "error": str(e)
